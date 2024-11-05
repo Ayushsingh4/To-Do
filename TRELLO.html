@@ -1,60 +1,434 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Trello-Like</title>
-    <link rel="stylesheet" href="TRELLO.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <script src="TRELLO.js"></script>
-</head>
-<body onload="loadTasks()">
-<div class="header">
-    <img src="portfolio-logomd.png" alt="logo" style="width: 40px;">
-    <div class="header-right">
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        background-color: white;
+
+        margin: auto;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .header {
+        overflow: hidden;
+        background-color: #cadfe6;
+        padding: 20px 10px;
+      }
+
+      .header a {
+        float: left;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        text-decoration: none;
+        font-size: 28px;
+        line-height: 25px;
+        border-radius: 4px;
+      }
+
+      .header a.canban {
+        font-size: 28px;
+        font-weight: bold;
+        padding: 10px;
+        position: absolute;
+        right: 1356px;
+        color: #8aaae5;
+      }
+      #stretch:hover {
+        color: dodgerblue;
+      }
+      #stretch {
+        height: 70px;
+        padding-top: 20px;
+        padding-left: 24px;
+        font-weight: bold;
+        font-size: 20px;
+        margin: auto;
+      }
+      .changer {
+        float: right;
+        background-color: dodgerblue;
+        color: white;
+        font-size: 15px;
+        height: 35px;
+        border: none;
+        border-radius: 8px;
+        width: 24px;
+        margin-top: 6px;
+        padding: inherit;
+        padding-top: 6px;
+        padding-right: 64px;
+        padding-left: 50px;
+      }
+
+      .header-right {
+        float: right;
+      }
+      @media screen and (max-width: 500px) {
+        .header a {
+          float: none;
+          display: block;
+          text-align: left;
+        }
+      }
+      .header-right .login-container {
+        float: right;
+      }
+
+      .header-right input[type="text"] {
+        padding: 6px;
+        margin-top: 8px;
+        font-size: 17px;
+        border: none;
+        width: 250px;
+      }
+
+      .header-right .login-container input[type="button"] {
+        float: right;
+        padding: 6px;
+        margin-top: 8px;
+        margin-right: 16px;
+        background: dodgerblue;
+        font-size: 17px;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        color: white;
+      }
+      .board-layout {
+        background-color: white;
+        font-family: Arial, Helvetica, sans-serif;
+        font-size: 15px;
+        display: grid;
+        grid-template-rows: max-content auto;
+        grid-gap: 10px;
+        padding: 10px;
+        height: 800px;
+      }
+
+      .board-lists {
+        display: grid;
+        grid-auto-columns: 275px;
+        grid-auto-flow: column;
+        grid-gap: 80px;
+        height: 400px;
+      }
+
+      .board-list {
+        background-color: rgb(235, 236, 240);
+        border-radius: 8px;
+        display: grid;
+        grid-auto-rows: max-content;
+        grid-gap: 10px;
+        width: 335px;
+        height: 1000px;
+        padding: 10px;
+      }
+      h3 {
+        font-weight: bold;
+        margin: auto;
+        padding: 4px;
+        border: 2px double #6b7275;
+        border-style: hidden hidden double hidden;
+        user-select: none;
+      }
+
+      .card {
+        background-color: white;
+        border-radius: 3px;
+        min-height: 75px;
+        overflow: hidden;
+        box-shadow: 0 1px 0 rgba(9, 30, 66, 0.25);
+        padding: 16px;
+        cursor: pointer;
+      }
+      .status-btn {
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        padding: 8px 12px;
+        border-radius: 5px;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .status-btn:hover {
+        background-color: #45a049;
+      }
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1;
+        padding-top: 60px;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.4);
+      }
+
+      .modal-content {
+        background-color: #fefefe;
+        margin: auto;
+        padding: 20px;
+        border: 1px solid #888;
+        width: 80%;
+        max-width: 400px;
+        border-radius: 8px;
+        text-align: center;
+      }
+
+      .close {
+        color: #aaa;
+        float: right;
+        font-size: 28px;
+        font-weight: bold;
+      }
+
+      .close:hover,
+      .close:focus {
+        color: black;
+        text-decoration: none;
+        cursor: pointer;
+      }
+
+      .modal select {
+        padding: 10px;
+        font-size: 16px;
+        margin-bottom: 10px;
+      }
+
+      .modal button {
+        padding: 8px 16px;
+        font-size: 16px;
+        border: none;
+        border-radius: 5px;
+        margin: 5px;
+        cursor: pointer;
+      }
+
+      .modal button:hover {
+        background-color: #ddd;
+      }
+
+      .delete-btn {
+        background-color: #ff4d4d;
+        color: white;
+      }
+    </style>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+  </head>
+  <body onload="loadTasks()">
+    <div class="header">
+      <img src="portfolio-logomd.png" alt="logo" style="width: 40px" />
+      <div class="header-right">
         <div class="login-container">
-            <form>
-                <input type="text" id="user_input" placeholder="Work Title">
-                <input type="text" id="user_input2" placeholder="Work Description">
-                &nbsp;<input type="button" onclick="addTask();" value="+Add">
-            </form>
+          <form>
+            <input type="text" id="user_input" placeholder="Work Title" />
+            <input
+              type="text"
+              id="user_input2"
+              placeholder="Work Description"
+            />
+            &nbsp;<input type="button" onclick="addTask();" value="+Add" />
+          </form>
         </div>
+      </div>
     </div>
-</div>
 
-<div class="board-layout">
-    <div id="stretch">WORK FLOW </div>
-    <div id='boardlists' class="board-lists">
-        <div id='list1' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
-            <h3>To Do</h3>
+    <div class="board-layout">
+      <div id="stretch">WORK FLOW</div>
+      <div id="boardlists" class="board-lists">
+        <div
+          id="list1"
+          class="board-list"
+          ondrop="dropIt(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>To Do</h3>
         </div>
-        <div id='list2' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
-            <h3>Has Not Started</h3>
+        <div
+          id="list2"
+          class="board-list"
+          ondrop="dropIt(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>Has Not Started</h3>
         </div>
-        <div id='list3' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
-            <h3>In Progress</h3>
+        <div
+          id="list3"
+          class="board-list"
+          ondrop="dropIt(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>In Progress</h3>
         </div>
-        <div id='list4' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
-            <h3>Its Done</h3>
+        <div
+          id="list4"
+          class="board-list"
+          ondrop="dropIt(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>Its Done</h3>
         </div>
+      </div>
     </div>
-</div>
 
-<!-- Custom Modal -->
-<div id="statusModal" class="modal">
-    <div class="modal-content">
+    <!-- Custom Modal -->
+    <div id="statusModal" class="modal">
+      <div class="modal-content">
         <span class="close" onclick="closeModal()">&times;</span>
         <h3>Change Task Status</h3>
         <select id="statusSelect">
-            <option value="list1">To Do</option>
-            <option value="list2">Has Not Started</option>
-            <option value="list3">In Progress</option>
-            <option value="list4">Its Done</option>
+          <option value="list1">To Do</option>
+          <option value="list2">Has Not Started</option>
+          <option value="list3">In Progress</option>
+          <option value="list4">Its Done</option>
         </select>
         <button onclick="updateTaskStatus()">Update Status</button>
         <button onclick="deleteTask()" class="delete-btn">Delete Task</button>
+      </div>
     </div>
-</div>
 
-</body>
+    <script>
+      let taskCount = 0;
+      let currentTaskId = null; // To store the ID of the task being edited
+
+      function loadTasks() {
+        const savedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+        savedTasks.forEach((taskData) => addTaskToColumn(taskData));
+      }
+
+      function saveTasks() {
+        const tasks = [];
+        document.querySelectorAll(".card").forEach((task) => {
+          tasks.push({
+            id: task.id,
+            title: task.querySelector("p").textContent.split(":")[0],
+            description: task.querySelector("p").textContent.split(": ")[1],
+            time: Number(task.dataset.time), // Store time as a number (timestamp)
+            status: task.parentElement.id,
+          });
+        });
+        localStorage.setItem("tasks", JSON.stringify(tasks));
+      }
+
+      function addTask() {
+        const title = document.getElementById("user_input").value;
+        const description = document.getElementById("user_input2").value;
+
+        if (!title || !description) {
+          alert("Please fill in both fields");
+          return;
+        }
+
+        const taskData = {
+          id: `task-${taskCount++}`,
+          title,
+          description,
+          time: Date.now(), // Save the timestamp as a number
+          status: "list1",
+        };
+
+        addTaskToColumn(taskData);
+        saveTasks();
+        document.getElementById("user_input").value = "";
+        document.getElementById("user_input2").value = "";
+      }
+
+      function addTaskToColumn(taskData) {
+        const taskDiv = document.createElement("div");
+        taskDiv.className = "card";
+        taskDiv.draggable = true;
+        taskDiv.id = taskData.id;
+        taskDiv.dataset.time = taskData.time; // Store the timestamp as data attribute
+        taskDiv.ondragstart = dragStart;
+
+        // Format the date on load
+        const formattedDate = new Date(taskData.time).toLocaleString();
+
+        taskDiv.innerHTML = `
+        <p>${taskData.title}: ${taskData.description}</p>
+        <p class="timestamp">Assigned on ${formattedDate}</p>
+        <button class="status-btn" onclick="openModal('${taskData.id}')">Change Status</button>
+    `;
+
+        updateTaskColor(taskDiv, taskData.status);
+        document.getElementById(taskData.status).appendChild(taskDiv);
+      }
+
+      function allowDrop(ev) {
+        ev.preventDefault();
+      }
+
+      function dragStart(ev) {
+        ev.dataTransfer.setData("text/plain", ev.target.id);
+      }
+
+      function dropIt(ev) {
+        ev.preventDefault();
+        const taskId = ev.dataTransfer.getData("text/plain");
+        const task = document.getElementById(taskId);
+        ev.target.appendChild(task);
+
+        updateTaskColor(task, ev.target.id);
+        saveTasks();
+      }
+
+      function updateTaskColor(task, statusId) {
+        if (statusId === "list1")
+          task.style.backgroundColor = "#ADD8E6"; // Blue for "To Do"
+        else if (statusId === "list2")
+          task.style.backgroundColor = "#FFCCCB"; // Red for "Not Started"
+        else if (statusId === "list3")
+          task.style.backgroundColor = "#FFFFE0"; // Yellow for "In Progress"
+        else if (statusId === "list4") task.style.backgroundColor = "#90EE90"; // Green for "Done"
+      }
+
+      function openModal(taskId) {
+        currentTaskId = taskId;
+        document.getElementById("statusModal").style.display = "block";
+      }
+
+      function closeModal() {
+        document.getElementById("statusModal").style.display = "none";
+      }
+
+      function updateTaskStatus() {
+        const task = document.getElementById(currentTaskId);
+        const newStatus = document.getElementById("statusSelect").value;
+
+        document.getElementById(newStatus).appendChild(task);
+        updateTaskColor(task, newStatus);
+        saveTasks();
+        closeModal();
+      }
+
+      function deleteTask() {
+        const task = document.getElementById(currentTaskId);
+        task.remove();
+        saveTasks();
+        closeModal();
+      }
+
+      window.onclick = function (event) {
+        const modal = document.getElementById("statusModal");
+        if (event.target == modal) {
+          closeModal();
+        }
+      };
+    </script>
+  </body>
 </html>
