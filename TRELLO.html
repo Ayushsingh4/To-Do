@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trello-Like</title>
+    <link rel="stylesheet" href="TRELLO.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="TRELLO.js"></script>
+</head>
+<body onload="loadTasks()">
+<div class="header">
+    <img src="portfolio-logomd.png" alt="logo" style="width: 40px;">
+    <div class="header-right">
+        <div class="login-container">
+            <form>
+                <input type="text" id="user_input" placeholder="Work Title">
+                <input type="text" id="user_input2" placeholder="Work Description">
+                &nbsp;<input type="button" onclick="addTask();" value="+Add">
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="board-layout">
+    <div id="stretch">WORK FLOW </div>
+    <div id='boardlists' class="board-lists">
+        <div id='list1' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
+            <h3>To Do</h3>
+        </div>
+        <div id='list2' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
+            <h3>Has Not Started</h3>
+        </div>
+        <div id='list3' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
+            <h3>In Progress</h3>
+        </div>
+        <div id='list4' class="board-list" ondrop="dropIt(event)" ondragover="allowDrop(event)">
+            <h3>Its Done</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Custom Modal -->
+<div id="statusModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h3>Change Task Status</h3>
+        <select id="statusSelect">
+            <option value="list1">To Do</option>
+            <option value="list2">Has Not Started</option>
+            <option value="list3">In Progress</option>
+            <option value="list4">Its Done</option>
+        </select>
+        <button onclick="updateTaskStatus()">Update Status</button>
+        <button onclick="deleteTask()" class="delete-btn">Delete Task</button>
+    </div>
+</div>
+
+</body>
+</html>
